@@ -74,17 +74,16 @@ class AddLocationActivity : AppCompatActivity() {
                 return
             }
 
-            val data = hashMapOf(
-                "userId" to user?.uid,
-                "name" to name,
-                "description" to desc,
-                "latitude" to currentLat,
-                "longitude" to currentLng,
-                "timestamp" to System.currentTimeMillis()
+            val newCheckpoint = Checkpoint(
+                userId = user?.uid,
+                name = name,
+                description = desc,
+                latitude = currentLat,
+                longitude = currentLng
             )
 
             db.collection("checkpoints")
-                .add(data)
+                .add(newCheckpoint)
                 .addOnSuccessListener {
                     // 🔹 Tampilkan notifikasi berhasil
                     Toast.makeText(this, "Lokasi disimpan ✅", Toast.LENGTH_SHORT).show()

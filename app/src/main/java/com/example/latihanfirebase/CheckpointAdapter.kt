@@ -7,11 +7,6 @@ import android.widget.Button // Ganti dari ImageButton ke Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-// 1. Interface Listener tetap sama
-interface OnItemClickListener {
-    fun onMapClick(checkpoint: Checkpoint)
-}
-
 // 2. Adapter menerima listener sebagai parameter
 class CheckpointAdapter(
     private val items: List<Checkpoint>,
@@ -45,6 +40,10 @@ class CheckpointAdapter(
         // 3. Set Click Listener pada tombol
         holder.btnOpenMap.setOnClickListener {
             listener.onMapClick(item)
+        }
+
+        holder.itemView.setOnClickListener {
+            listener.onItemClick(item) // Panggil fungsi onItemClick pada listener
         }
     }
 }
