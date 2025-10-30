@@ -1,7 +1,7 @@
 package com.example.latihanfirebase
 
 import android.content.Intent
-import android.net.Uri // Import Uri untuk Intent Map
+import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.Toast
@@ -16,10 +16,9 @@ import com.example.latihanfirebase.DetailActivity
 
 interface OnItemClickListener {
     fun onMapClick(checkpoint: Checkpoint)
-    fun onItemClick(checkpoint: Checkpoint) // Fungsi yang di-override
+    fun onItemClick(checkpoint: Checkpoint)
 }
 
-// 1. Implementasikan interface OnItemClickListener
 class HomeActivity : AppCompatActivity(), OnItemClickListener {
 
     private lateinit var recyclerView: RecyclerView
@@ -37,7 +36,6 @@ class HomeActivity : AppCompatActivity(), OnItemClickListener {
         val btnLogout: ImageButton = findViewById(R.id.btnLogout)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
-        // 2. Berikan 'this' (HomeActivity) sebagai listener ke Adapter
         adapter = CheckpointAdapter(checkpointList, this)
         recyclerView.adapter = adapter
 
@@ -58,27 +56,25 @@ class HomeActivity : AppCompatActivity(), OnItemClickListener {
         // user?.uid?.let memastikan hanya pengguna yang terotentikasi yang dicari
         user?.uid?.let { uid ->
             db.collection("checkpoints")
-                .whereEqualTo("userId", uid) // PASTIKAN CASE SENSITIVITY FIELD INI BENAR
+                .whereEqualTo("userId", uid)
                 .orderBy("timestamp")
                 .get()
                 .addOnSuccessListener { result ->
-                    // 1. Bersihkan daftar sebelum menambahkan data baru
                     checkpointList.clear()
 
                     if (result.isEmpty) {
                         Toast.makeText(this, "Anda belum menambahkan checkpoint.", Toast.LENGTH_SHORT).show()
                     }
 
-                    // 2. Iterasi melalui hasil dan konversi ke objek Checkpoint
+                    // perulangan buat munculin cpnya
                     for (doc in result) {
                         try {
                             val cp = doc.toObject(Checkpoint::class.java)
 
-                            // PENTING: Ambil ID dokumen dari Firestore dan simpan di objek Checkpoint
-                            // (Diperlukan untuk dikirim ke DetailActivity)
+                            // ambil id dokumen buat diteruskan ke detail activiti
                             cp.id = doc.id
 
-                            // Tambahkan hanya jika data mapping berhasil (misalnya, field 'name' ada)
+                            // nambah kalo name not null
                             if (cp.name != null) {
                                 checkpointList.add(cp)
                             }
@@ -88,15 +84,14 @@ class HomeActivity : AppCompatActivity(), OnItemClickListener {
                         }
                     }
 
-                    // 3. Beri tahu Adapter bahwa data telah berubah
+                    // ngasi tahu Adapter bahwa data telah berubah
                     adapter.notifyDataSetChanged()
                 }
                 .addOnFailureListener { exception ->
-                    // Tampilkan pesan error jika query gagal (misalnya, masalah index/koneksi)
+                    // misal ga ke load muncul pesan ini
                     Toast.makeText(this, "Gagal memuat data: ${exception.message}", Toast.LENGTH_LONG).show()
                 }
         } ?: run {
-            // Ini berjalan jika user == null (Pengguna belum login)
             Toast.makeText(this, "Anda harus login untuk memuat data.", Toast.LENGTH_LONG).show()
         }
     }
@@ -113,7 +108,7 @@ class HomeActivity : AppCompatActivity(), OnItemClickListener {
             startActivity(intent)
         } ?: Toast.makeText(this, "ID Checkpoint hilang.", Toast.LENGTH_SHORT).show()
     }
-    // 3. Implementasi fungsi onMapClick dari interface
+
     override fun onMapClick(checkpoint: Checkpoint) {
         val lat = checkpoint.latitude
         val lng = checkpoint.longitude

@@ -13,14 +13,12 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class DetailActivity : AppCompatActivity() {
-
-    // Kunci Intent yang digunakan oleh HomeActivity
     companion object {
         const val EXTRA_CHECKPOINT_ID = "extra_checkpoint_id"
     }
 
     private val db = FirebaseFirestore.getInstance()
-    private var activeCheckpointId: String? = null // Menyimpan ID dokumen yang sedang ditampilkan
+    private var activeCheckpointId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,23 +27,22 @@ class DetailActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbarDetail)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Detail Checkpoint" // Judul Statis
+        supportActionBar?.title = "Detail Checkpoint"
 
         val btnEdit: Button = findViewById(R.id.btnEdit)
         val btnDelete: Button = findViewById(R.id.btnDelete)
 
-        // 1. Ambil ID dokumen dari Intent
         val checkpointId = intent.getStringExtra(EXTRA_CHECKPOINT_ID)
 
         if (checkpointId != null) {
-            activeCheckpointId = checkpointId // Simpan ID
+            activeCheckpointId = checkpointId
+            //loadCheckpointDetails(checkpointId)
         } else {
             Toast.makeText(this, "ID Checkpoint hilang!", Toast.LENGTH_LONG).show()
             finish()
             return
         }
 
-        // 2. Setup Listener Tombol
         btnEdit.setOnClickListener {
             editCheckpoint()
         }
@@ -56,13 +53,10 @@ class DetailActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
-        // Pastikan ID tersedia, lalu muat data terbaru
         activeCheckpointId?.let { id ->
             loadCheckpointDetails(id)
         }
     }
-
     // Fungsi untuk memuat data detail dari Firestore berdasarkan ID
     private fun loadCheckpointDetails(id: String) {
         db.collection("checkpoints").document(id)
@@ -134,7 +128,6 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    // --- FUNGSI EDIT ---
     private fun editCheckpoint() {
         if (activeCheckpointId != null) {
             val intent = Intent(this, EditLocationActivity::class.java) // Ganti ke EditLocationActivity
@@ -145,7 +138,6 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    // Mengaktifkan tombol kembali (panah di toolbar)
     override fun onSupportNavigateUp(): Boolean {
         onBackPressedDispatcher.onBackPressed()
         return true

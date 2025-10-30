@@ -28,13 +28,12 @@ class EditLocationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_location)
 
-        // Inisialisasi View
+
         etName = findViewById(R.id.etNameEdit)
         etDesc = findViewById(R.id.etDescEdit)
         tvCoordinates = findViewById(R.id.tvCoordinatesEdit)
         btnUpdate = findViewById(R.id.btnUpdate)
 
-        // Ambil ID dari Intent
         checkpointId = intent.getStringExtra(EXTRA_CHECKPOINT_ID)
 
         if (checkpointId == null) {
@@ -61,7 +60,7 @@ class EditLocationActivity : AppCompatActivity() {
                         etName.setText(checkpoint.name)
                         etDesc.setText(checkpoint.description)
 
-                        // Tampilkan koordinat (tidak bisa diubah di sini)
+                        // nampilin koordinat, tp ga diupdate
                         val lat = checkpoint.latitude ?: 0.0
                         val lng = checkpoint.longitude ?: 0.0
                         tvCoordinates.text = "Lat: $lat, Lng: $lng"
@@ -87,20 +86,17 @@ class EditLocationActivity : AppCompatActivity() {
             return
         }
 
-        // Data yang ingin diupdate (hanya nama dan deskripsi)
+        // yang mau di update
         val updates = hashMapOf<String, Any>(
             "name" to name,
             "description" to desc
-            // Koordinat dan userId tidak diubah di sini
+            // lokasi gabisa diubah
         )
-
+0.0
         db.collection("checkpoints").document(id)
             .update(updates)
             .addOnSuccessListener {
                 Toast.makeText(this, "Checkpoint berhasil diperbarui! ✅", Toast.LENGTH_SHORT).show()
-
-                // Kembali ke DetailActivity atau HomeActivity
-                // Menggunakan finish() akan kembali ke DetailActivity
                 finish()
             }
             .addOnFailureListener {

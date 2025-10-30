@@ -14,7 +14,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-
+import java.util.UUID
 class AddLocationActivity : AppCompatActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -51,7 +51,11 @@ class AddLocationActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                100
+            )
             return
         }
 
@@ -66,39 +70,40 @@ class AddLocationActivity : AppCompatActivity() {
     }
 
     private fun saveLocation() {
-            val name = etName.text.toString().trim()
-            val desc = etDesc.text.toString().trim()
+        val name = etName.text.toString().trim()
+        val desc = etDesc.text.toString().trim()
 
-            if (name.isEmpty() || currentLat == null || currentLng == null) {
-                Toast.makeText(this, "Isi nama dan pastikan lokasi aktif", Toast.LENGTH_SHORT).show()
-                return
+        if (name.isEmpty() || currentLat == null || currentLng == null) {
+            Toast.makeText(this, "Isi nama dan pastikan lokasi aktif", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val uuid = UUID.randomUUID()
+
+        val newCheckpoint = Checkpoint(
+            id = uuid.toString(),
+            userId = user?.uid,
+            name = name,
+            description = desc,
+            latitude = currentLat,
+            longitude = currentLng
+        )
+
+        db.collection("checkpoints")
+            .add(newCheckpoint)
+            .addOnSuccessListener {
+                // Tampilkan notifikasi berhasil
+                Toast.makeText(this, "Lokasi disimpan ✅", Toast.LENGTH_SHORT).show()
+
+                // Balik ke HomeActivity
+                val intent = Intent(this, HomeActivity::class.java)
+                // biar gak numpuk activity
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+                finish()
             }
-
-            val newCheckpoint = Checkpoint(
-                userId = user?.uid,
-                name = name,
-                description = desc,
-                latitude = currentLat,
-                longitude = currentLng
-            )
-
-            db.collection("checkpoints")
-                .add(newCheckpoint)
-                .addOnSuccessListener {
-                    // 🔹 Tampilkan notifikasi berhasil
-                    Toast.makeText(this, "Lokasi disimpan ✅", Toast.LENGTH_SHORT).show()
-
-                    // 🔹 Balik ke HomeActivity
-                    val intent = Intent(this, HomeActivity::class.java)
-                    // biar gak numpuk activity
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(intent)
-
-                    // Tutup halaman AddLocation
-                    finish()
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Gagal menyimpan lokasi ❌", Toast.LENGTH_SHORT).show()
-                }
+            .addOnFailureListener {
+                Toast.makeText(this, "Gagal menyimpan lokasi ❌", Toast.LENGTH_SHORT).show()
+            }
     }
 }

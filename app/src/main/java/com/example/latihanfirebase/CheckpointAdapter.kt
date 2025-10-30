@@ -3,22 +3,24 @@ package com.example.latihanfirebase
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button // Ganti dari ImageButton ke Button
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-// 2. Adapter menerima listener sebagai parameter
+// Adapter menerima list cp dan listener sebagai parameter
 class CheckpointAdapter(
     private val items: List<Checkpoint>,
-    private val listener: OnItemClickListener // Tambahkan listener
+    private val listener: OnItemClickListener
 ) :
     RecyclerView.Adapter<CheckpointAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.tvName)
         val desc: TextView = view.findViewById(R.id.tvDescription)
+        val tanggal: TextView = view.findViewById(R.id.tvTanggal)
         val coords: TextView = view.findViewById(R.id.tvCoordinates)
-        // Ubah tipe variabel menjadi Button
         val btnOpenMap: Button = view.findViewById(R.id.btnOpenMap)
     }
 
@@ -37,7 +39,11 @@ class CheckpointAdapter(
         holder.desc.text = item.description
         holder.coords.text = "Lat: ${item.latitude}, Lng: ${item.longitude}"
 
-        // 3. Set Click Listener pada tombol
+        val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy", Locale.getDefault())
+
+        // Konversi objek Date menjadi String
+        holder.tanggal.text = dateFormat.format(item.timestamp)
+
         holder.btnOpenMap.setOnClickListener {
             listener.onMapClick(item)
         }
